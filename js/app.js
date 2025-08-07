@@ -12,6 +12,8 @@ class CoordinateQueryApp {
             osm: null
         };
         this.currentMapType = 'gaode';
+        this.coordinateFormat = 'decimal'; // 'decimal' 或 'dms' (度分秒)
+        this.isCoordinateReversed = false; // 是否反选坐标（纬度在前）
         
         this.init();
     }
@@ -77,6 +79,16 @@ class CoordinateQueryApp {
             this.clearMarker();
         });
 
+        // 格式切换按钮
+        document.getElementById('formatToggle').addEventListener('click', () => {
+            this.toggleCoordinateFormat();
+        });
+
+        // 坐标反选按钮
+        document.getElementById('coordReverse').addEventListener('click', () => {
+            this.toggleCoordinateReverse();
+        });
+
 
 
         // 地图鼠标移动事件 - 实时坐标显示
@@ -137,9 +149,8 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 显示经纬度坐标，分别显示经度和纬度
-        document.getElementById('hover-lng').textContent = displayLng.toFixed(6);
-        document.getElementById('hover-lat').textContent = displayLat.toFixed(6);
+        // 使用新的格式化方法显示坐标
+        this.updateCoordinateDisplay('hover', displayLng, displayLat);
 
         // 更新状态栏
         this.updateStatus(`鼠标停留坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
@@ -186,9 +197,8 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 显示点击坐标，分别显示经度和纬度
-        document.getElementById('click-lng').textContent = displayLng.toFixed(6);
-        document.getElementById('click-lat').textContent = displayLat.toFixed(6);
+        // 使用新的格式化方法显示坐标
+        this.updateCoordinateDisplay('click', displayLng, displayLat);
 
         // 添加弹出框显示坐标信息
         const popupContent = `
@@ -226,6 +236,150 @@ class CoordinateQueryApp {
      */
     updateStatus(message) {
         document.getElementById('statusText').textContent = message;
+    }
+
+    /**
+     * 将小数点坐标转换为度分秒格式
+     */
+    decimalToDMS(decimal, isLongitude = true) {
+        const abs = Math.abs(decimal);
+        const degrees = Math.floor(abs);
+        const minutes = Math.floor((abs - degrees) * 60);
+        const seconds = ((abs - degrees) * 60 - minutes) * 60;
+        
+        const direction = isLongitude 
+            ? (decimal >= 0 ? 'E' : 'W')
+            : (decimal >= 0 ? 'N' : 'S');
+        
+        return `${degrees}°${minutes}'${seconds.toFixed(2)}"${direction}`;
+    }
+
+    /**
+     * 格式化坐标显示
+     */
+    formatCoordinate(lng, lat) {
+        if (this.coordinateFormat === 'dms') {
+            const lngDMS = this.decimalToDMS(lng, true);
+            const latDMS = this.decimalToDMS(lat, false);
+            
+            if (this.isCoordinateReversed) {
+                return { first: latDMS, second: lngDMS };
+            } else {
+                return { first: lngDMS, second: latDMS };
+            }
+        } else {
+            const lngDecimal = lng.toFixed(6);
+            const latDecimal = lat.toFixed(6);
+            
+            if (this.isCoordinateReversed) {
+                return { first: latDecimal, second: lngDecimal };
+            } else {
+                return { first: lngDecimal, second: latDecimal };
+            }
+        }
+    }
+
+    /**
+     * 切换坐标格式
+     */
+    toggleCoordinateFormat() {
+        this.coordinateFormat = this.coordinateFormat === 'decimal' ? 'dms' : 'decimal';
+        
+        // 更新按钮文本
+        const formatBtn = document.getElementById('formatToggle');
+        const textNodes = Array.from(formatBtn.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+        if (textNodes.length > 0) {
+            textNodes[textNodes.length - 1].textContent = this.coordinateFormat === 'decimal' ? '小数点' : '度分秒';
+        }
+        
+        // 重新显示当前坐标
+        this.refreshCoordinateDisplay();
+        
+        const formatName = this.coordinateFormat === 'decimal' ? '小数点格式' : '度分秒格式';
+        this.updateStatus(`已切换到${formatName}`);
+    }
+
+    /**
+     * 切换坐标反选
+     */
+    toggleCoordinateReverse() {
+        this.isCoordinateReversed = !this.isCoordinateReversed;
+        
+        // 更新按钮文本
+        const reverseBtn = document.getElementById('coordReverse');
+        const textNodes = Array.from(reverseBtn.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+        if (textNodes.length > 0) {
+            textNodes[textNodes.length - 1].textContent = this.isCoordinateReversed ? '已反选' : '反选';
+        }
+        
+        // 更新所有标签
+        this.updateCoordinateLabels('hover');
+        this.updateCoordinateLabels('click');
+        
+        // 重新显示当前坐标
+        this.refreshCoordinateDisplay();
+        
+        const statusText = this.isCoordinateReversed ? '纬度在前' : '经度在前';
+        this.updateStatus(`坐标显示顺序: ${statusText}`);
+    }
+
+    /**
+     * 刷新坐标显示
+     */
+    refreshCoordinateDisplay() {
+        // 重新触发当前的坐标显示
+        // 如果有标记点，重新显示其坐标
+        if (this.currentMarker) {
+            const latlng = this.currentMarker.getLatLng();
+            let displayLng = latlng.lng;
+            let displayLat = latlng.lat;
+            
+            if (this.currentMapType === 'gaode') {
+                const wgs84 = this.coordConverter.gcj02ToWgs84(latlng.lng, latlng.lat);
+                displayLng = wgs84[0];
+                displayLat = wgs84[1];
+            }
+            
+            this.updateCoordinateDisplay('click', displayLng, displayLat);
+        }
+    }
+
+    /**
+     * 更新坐标显示
+     */
+    updateCoordinateDisplay(type, lng, lat) {
+        const formatted = this.formatCoordinate(lng, lat);
+        
+        // 更新标签
+        this.updateCoordinateLabels(type);
+        
+        if (this.isCoordinateReversed) {
+            // 纬度在前
+            document.getElementById(`${type}-lng`).textContent = formatted.second;
+            document.getElementById(`${type}-lat`).textContent = formatted.first;
+        } else {
+            // 经度在前
+            document.getElementById(`${type}-lng`).textContent = formatted.first;
+            document.getElementById(`${type}-lat`).textContent = formatted.second;
+        }
+    }
+
+    /**
+     * 更新坐标标签
+     */
+    updateCoordinateLabels(type) {
+        const lngLabel = document.getElementById(`${type}-lng-label`);
+        const latLabel = document.getElementById(`${type}-lat-label`);
+        
+        if (this.isCoordinateReversed) {
+            // 纬度在前，经度在后
+            lngLabel.textContent = '纬度 (Lat):';
+            latLabel.textContent = '经度 (Lng):';
+        } else {
+            // 经度在前，纬度在后
+            lngLabel.textContent = '经度 (Lng):';
+            latLabel.textContent = '纬度 (Lat):';
+        }
     }
 
 

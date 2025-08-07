@@ -34,6 +34,20 @@
                         <option value="osm">OpenStreetMap</option>
                     </select>
                 </div>
+                
+                <button id="formatToggle" class="btn format-btn" title="切换坐标格式">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    小数点
+                </button>
+                
+                <button id="coordReverse" class="btn reverse-btn" title="坐标反选">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/>
+                    </svg>
+                    反选
+                </button>
             </div>
             
             <div class="toolbar-right">
@@ -62,11 +76,11 @@
                     </div>
                     <div class="coord-content">
                         <div class="coord-row">
-                            <span class="coord-label">经度 (Lng):</span>
+                            <span id="hover-lng-label" class="coord-label">经度 (Lng):</span>
                             <span id="hover-lng" class="coord-value">--</span>
                         </div>
                         <div class="coord-row">
-                            <span class="coord-label">纬度 (Lat):</span>
+                            <span id="hover-lat-label" class="coord-label">纬度 (Lat):</span>
                             <span id="hover-lat" class="coord-value">--</span>
                         </div>
                     </div>
@@ -79,11 +93,11 @@
                     </div>
                     <div class="coord-content">
                         <div class="coord-row">
-                            <span class="coord-label">经度 (Lng):</span>
+                            <span id="click-lng-label" class="coord-label">经度 (Lng):</span>
                             <span id="click-lng" class="coord-value">--</span>
                         </div>
                         <div class="coord-row">
-                            <span class="coord-label">纬度 (Lat):</span>
+                            <span id="click-lat-label" class="coord-label">纬度 (Lat):</span>
                             <span id="click-lat" class="coord-value">--</span>
                         </div>
                     </div>
