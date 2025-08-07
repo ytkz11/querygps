@@ -73,7 +73,7 @@ class CoordinateQueryApp {
         });
 
         // 清除标记按钮
-        document.getElementById('clearBtn').addEventListener('click', () => {
+        document.getElementById('clearMarker').addEventListener('click', () => {
             this.clearMarker();
         });
 
