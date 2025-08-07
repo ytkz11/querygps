@@ -11,6 +11,15 @@ body {
     color: #333;
     overflow: hidden;
     backdrop-filter: blur(10px);
+    /* 移动端优化 */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    /* 安全区域适配 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* 应用容器 */
@@ -483,16 +492,27 @@ body {
     line-height: 1.5;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 平板设备 */
+@media (max-width: 1024px) {
+    .coord-container {
+        gap: 20px;
+    }
+    
+    .coord-card {
+        padding: 18px;
+    }
+}
+
+/* 响应式设计 - 手机设备 */
 @media (max-width: 768px) {
     .app-container {
         height: 100vh;
     }
     
     .toolbar {
-        padding: 16px 20px;
+        padding: 12px 16px;
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
         align-items: stretch;
     }
     
@@ -500,56 +520,204 @@ body {
     .toolbar-center,
     .toolbar-right {
         justify-content: center;
-    }
-    
-    .clear-btn {
-        min-width: 140px;
-        padding: 12px 20px;
-        font-size: 14px;
+        flex-wrap: wrap;
+        gap: 8px;
     }
     
     .app-title {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         text-align: center;
+        margin-bottom: 8px;
     }
     
     .coord-panel {
-        padding: 16px 20px;
+        padding: 12px 16px;
     }
     
     .coord-container {
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
     }
     
     .coord-card {
-        padding: 16px;
+        padding: 14px;
+        border-radius: 12px;
+    }
+    
+    .coord-header {
+        margin-bottom: 12px;
+    }
+    
+    .coord-title {
+        font-size: 15px;
     }
     
     .coord-row {
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+        gap: 6px;
+    }
+    
+    .coord-row .coord-label {
+        font-size: 13px;
     }
     
     .coord-row .coord-value {
         min-width: 100%;
         width: 100%;
+        font-size: 13px;
+        padding: 10px 12px;
     }
     
-    .clear-btn,
+    .clear-btn {
+        min-width: 120px;
+        padding: 14px 20px;
+        font-size: 14px;
+        border-radius: 12px;
+    }
+    
     .info-btn {
-        padding: 10px 20px;
+        padding: 12px 20px;
         font-size: 13px;
     }
     
     .github-btn {
-        padding: 10px 16px;
+        padding: 12px 16px;
+        font-size: 13px;
     }
     
     .map-type-select {
-        min-width: 120px;
+        min-width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
     }
+    
+    #map {
+        border-radius: 0;
+    }
+}
+
+/* 响应式设计 - 小屏手机 */
+@media (max-width: 480px) {
+    .toolbar {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+    
+    .app-title {
+        font-size: 1.2rem;
+    }
+    
+    .coord-panel {
+        padding: 10px 12px;
+    }
+    
+    .coord-container {
+        gap: 10px;
+    }
+    
+    .coord-card {
+        padding: 12px;
+        border-radius: 10px;
+    }
+    
+    .coord-title {
+        font-size: 14px;
+    }
+    
+    .coord-row .coord-label {
+        font-size: 12px;
+    }
+    
+    .coord-row .coord-value {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    
+    .clear-btn {
+        min-width: 100px;
+        padding: 12px 16px;
+        font-size: 13px;
+        gap: 6px;
+    }
+    
+    .clear-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .github-btn {
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+    
+    .github-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .map-type-select {
+         padding: 10px 14px;
+         font-size: 13px;
+     }
+}
+
+/* 移动端触摸优化 */
+@media (hover: none) and (pointer: coarse) {
+    /* 增加触摸目标大小 */
+    .clear-btn,
+    .info-btn,
+    .github-btn {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    .map-type-select {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    /* 移除悬停效果，使用触摸反馈 */
+    .clear-btn:hover,
+    .info-btn:hover,
+    .github-btn:hover {
+        transform: none;
+    }
+    
+    .clear-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
+    }
+    
+    .github-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
+    }
+    
+    .coord-card:hover {
+        transform: none;
+    }
+    
+    .coord-card:active {
+         transform: scale(0.98);
+         transition: transform 0.1s;
+     }
+    
+     /* 地图移动端优化 */
+     #map {
+         touch-action: pan-x pan-y;
+     }
+    
+     /* 防止移动端双击缩放 */
+     .leaflet-container {
+         touch-action: pan-x pan-y;
+     }
+    
+     /* 移动端文本选择优化 */
+     .coord-value {
+         -webkit-user-select: text;
+         user-select: text;
+     }
 }
 
 /* 自定义滚动条 */
