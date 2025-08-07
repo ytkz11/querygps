@@ -13,7 +13,7 @@ class CoordinateQueryApp {
         };
         this.currentMapType = 'gaode';
         this.coordinateFormat = 'decimal'; // 'decimal' 或 'dms' (度分秒)
-        this.isCoordinateReversed = false; // 是否反选坐标（纬度在前）
+        this.currentFixedCoords = null; // 当前固定坐标
         
         this.init();
     }
@@ -70,30 +70,38 @@ class CoordinateQueryApp {
      */
     initEventListeners() {
         // 地图类型切换
-        document.getElementById('mapType').addEventListener('change', (e) => {
+        document.getElementById('mapTypeSelect').addEventListener('change', (e) => {
             this.switchMapType(e.target.value);
         });
 
         // 清除标记按钮
-        document.getElementById('clearMarker').addEventListener('click', () => {
+        document.getElementById('clearBtn').addEventListener('click', () => {
             this.clearMarker();
         });
 
         // 格式切换按钮
-        document.getElementById('formatToggle').addEventListener('click', () => {
+        document.getElementById('formatBtn').addEventListener('click', () => {
             this.toggleCoordinateFormat();
         });
 
-        // 坐标反选按钮
-        document.getElementById('coordReverse').addEventListener('click', () => {
-            this.toggleCoordinateReverse();
+        // 坐标输入按钮
+        document.getElementById('inputBtn').addEventListener('click', () => {
+            this.showCoordInputModal();
         });
 
+        // 模态框事件
+        this.initModalEvents();
 
 
-        // 地图鼠标移动事件 - 实时坐标显示
+
+        // 地图鼠标移动事件 - 动态坐标显示
         this.map.on('mousemove', (e) => {
-            this.updateRealtimeCoordinates(e.latlng);
+            this.updateDynamicCoordinates(e.latlng);
+        });
+
+        // 地图鼠标离开事件
+        this.map.on('mouseout', () => {
+            this.hideDynamicCoordinates();
         });
 
         // 地图点击事件 - 固定坐标显示
@@ -101,9 +109,9 @@ class CoordinateQueryApp {
             this.setFixedCoordinates(e.latlng);
         });
 
-        // 地图鼠标离开事件
-        this.map.on('mouseout', () => {
-            this.clearRealtimeCoordinates();
+        // 复制按钮事件
+        document.getElementById('copyCoords').addEventListener('click', () => {
+            this.copyToClipboard('both');
         });
     }
 
@@ -131,9 +139,9 @@ class CoordinateQueryApp {
     }
 
     /**
-     * 更新鼠标停留坐标显示
+     * 更新动态坐标显示
      */
-    updateRealtimeCoordinates(latlng) {
+    updateDynamicCoordinates(latlng) {
         const lat = latlng.lat;
         const lng = latlng.lng;
 
@@ -149,42 +157,48 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 使用新的格式化方法显示坐标
-        this.updateCoordinateDisplay('hover', displayLng, displayLat);
+        // 显示动态坐标
+        this.showDynamicCoordinates(displayLng, displayLat);
 
         // 更新状态栏
-        this.updateStatus(`鼠标停留坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
+        this.updateStatus(`当前坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
     }
 
     /**
-     * 清除鼠标停留坐标显示
+     * 显示动态坐标
      */
-    clearRealtimeCoordinates() {
-        document.getElementById('hover-lng').textContent = '--';
-        document.getElementById('hover-lat').textContent = '--';
-        this.updateStatus('移动鼠标查看坐标，点击地图固定坐标');
+    showDynamicCoordinates(lng, lat) {
+        const coordElement = document.getElementById('dynamicCoord');
+        const lngElement = document.getElementById('dynamic-lng');
+        const latElement = document.getElementById('dynamic-lat');
+        
+        // 格式化坐标
+        const formatted = this.formatCoordinate(lng, lat);
+        
+        // 更新坐标值
+        lngElement.textContent = formatted.lng;
+        latElement.textContent = formatted.lat;
+        
+        // 显示坐标面板
+        coordElement.classList.add('show');
     }
 
     /**
-     * 设置点击坐标显示
+     * 隐藏动态坐标显示
+     */
+    hideDynamicCoordinates() {
+        const coordElement = document.getElementById('dynamicCoord');
+        coordElement.classList.remove('show');
+        this.updateStatus('移动鼠标查看坐标');
+    }
+
+    /**
+     * 设置固定坐标显示
      */
     setFixedCoordinates(latlng) {
         const lat = latlng.lat;
         const lng = latlng.lng;
 
-        // 清除之前的标记
-        this.clearMarker();
-
-        // 添加图钉标记
-        this.currentMarker = L.marker([lat, lng], {
-            icon: L.divIcon({
-                className: 'pin-marker',
-                html: '<div style="color: #ff4757; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">📍</div>',
-                iconSize: [24, 24],
-                iconAnchor: [12, 24]
-            })
-        }).addTo(this.map);
-
         // 根据地图类型进行坐标转换
         let displayLng = lng;
         let displayLat = lat;
@@ -197,23 +211,80 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 使用新的格式化方法显示坐标
-        this.updateCoordinateDisplay('click', displayLng, displayLat);
+        // 存储当前坐标用于复制
+        this.currentFixedCoords = {
+            lng: displayLng,
+            lat: displayLat
+        };
 
-        // 添加弹出框显示坐标信息
-        const popupContent = `
-            <div style="font-family: monospace; font-size: 12px; line-height: 1.4;">
-                <strong>坐标信息</strong><br>
-                <strong>经度:</strong> ${displayLng.toFixed(6)}<br>
-                <strong>纬度:</strong> ${displayLat.toFixed(6)}
-            </div>
-        `;
-        
-        this.currentMarker.bindPopup(popupContent).openPopup();
+        // 显示固定坐标
+        this.showFixedCoordinates(displayLng, displayLat);
 
         // 更新状态栏
         this.updateStatus(`已固定坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
     }
+
+    /**
+     * 显示固定坐标
+     */
+    showFixedCoordinates(lng, lat) {
+        const coordElement = document.getElementById('fixedCoord');
+        const lngElement = document.getElementById('fixed-lng');
+        const latElement = document.getElementById('fixed-lat');
+        
+        // 格式化坐标
+        const formatted = this.formatCoordinate(lng, lat);
+        
+        // 更新坐标值
+        lngElement.textContent = formatted.lng;
+        latElement.textContent = formatted.lat;
+        
+        // 显示坐标面板
+        coordElement.style.display = 'block';
+    }
+
+    /**
+     * 复制坐标到剪贴板
+     */
+    async copyToClipboard(type) {
+        if (!this.currentFixedCoords) {
+            this.updateStatus('请先点击地图获取坐标');
+            return;
+        }
+
+        let value;
+        if (type === 'both') {
+            const formatted = this.formatCoordinate(this.currentFixedCoords.lng, this.currentFixedCoords.lat);
+            value = `${formatted.lng}, ${formatted.lat}`;
+        }
+
+        try {
+            await navigator.clipboard.writeText(value);
+            this.updateStatus(`已复制坐标: ${value}`);
+            
+            // 视觉反馈
+            const button = document.getElementById('copyCoords');
+            button.style.background = 'rgba(0, 255, 136, 0.4)';
+            button.style.borderColor = 'rgba(0, 255, 136, 0.6)';
+            
+            setTimeout(() => {
+                button.style.background = '';
+                button.style.borderColor = '';
+            }, 500);
+        } catch (err) {
+            // 降级方案：使用旧的复制方法
+            const textArea = document.createElement('textarea');
+            textArea.value = value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            this.updateStatus(`已复制坐标: ${value}`);
+        }
+    }
+
+
 
     /**
      * 清除标记
@@ -223,10 +294,6 @@ class CoordinateQueryApp {
             this.map.removeLayer(this.currentMarker);
             this.currentMarker = null;
         }
-
-        // 清除点击坐标显示
-        document.getElementById('click-lng').textContent = '--';
-        document.getElementById('click-lat').textContent = '--';
 
         this.updateStatus('已清除标记点');
     }
@@ -261,21 +328,11 @@ class CoordinateQueryApp {
         if (this.coordinateFormat === 'dms') {
             const lngDMS = this.decimalToDMS(lng, true);
             const latDMS = this.decimalToDMS(lat, false);
-            
-            if (this.isCoordinateReversed) {
-                return { first: latDMS, second: lngDMS };
-            } else {
-                return { first: lngDMS, second: latDMS };
-            }
+            return { lng: lngDMS, lat: latDMS };
         } else {
             const lngDecimal = lng.toFixed(6);
             const latDecimal = lat.toFixed(6);
-            
-            if (this.isCoordinateReversed) {
-                return { first: latDecimal, second: lngDecimal };
-            } else {
-                return { first: lngDecimal, second: latDecimal };
-            }
+            return { lng: lngDecimal, lat: latDecimal };
         }
     }
 
@@ -292,95 +349,160 @@ class CoordinateQueryApp {
             textNodes[textNodes.length - 1].textContent = this.coordinateFormat === 'decimal' ? '小数点' : '度分秒';
         }
         
-        // 重新显示当前坐标
-        this.refreshCoordinateDisplay();
-        
         const formatName = this.coordinateFormat === 'decimal' ? '小数点格式' : '度分秒格式';
         this.updateStatus(`已切换到${formatName}`);
     }
 
     /**
-     * 切换坐标反选
+     * 显示坐标输入模态框
      */
-    toggleCoordinateReverse() {
-        this.isCoordinateReversed = !this.isCoordinateReversed;
+    showCoordInputModal() {
+        const modal = document.getElementById('coordModal');
+        modal.style.display = 'block';
         
-        // 更新按钮文本
-        const reverseBtn = document.getElementById('coordReverse');
-        const textNodes = Array.from(reverseBtn.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
-        if (textNodes.length > 0) {
-            textNodes[textNodes.length - 1].textContent = this.isCoordinateReversed ? '已反选' : '反选';
-        }
+        // 清空输入框
+        document.getElementById('inputLng').value = '';
+        document.getElementById('inputLat').value = '';
         
-        // 更新所有标签
-        this.updateCoordinateLabels('hover');
-        this.updateCoordinateLabels('click');
-        
-        // 重新显示当前坐标
-        this.refreshCoordinateDisplay();
-        
-        const statusText = this.isCoordinateReversed ? '纬度在前' : '经度在前';
-        this.updateStatus(`坐标显示顺序: ${statusText}`);
+        // 聚焦到第一个输入框
+        setTimeout(() => {
+            document.getElementById('inputLng').focus();
+        }, 100);
     }
 
     /**
-     * 刷新坐标显示
+     * 隐藏坐标输入模态框
      */
-    refreshCoordinateDisplay() {
-        // 重新触发当前的坐标显示
-        // 如果有标记点，重新显示其坐标
-        if (this.currentMarker) {
-            const latlng = this.currentMarker.getLatLng();
-            let displayLng = latlng.lng;
-            let displayLat = latlng.lat;
-            
-            if (this.currentMapType === 'gaode') {
-                const wgs84 = this.coordConverter.gcj02ToWgs84(latlng.lng, latlng.lat);
-                displayLng = wgs84[0];
-                displayLat = wgs84[1];
+    hideCoordInputModal() {
+        const modal = document.getElementById('coordModal');
+        modal.style.display = 'none';
+    }
+
+    /**
+     * 初始化模态框事件
+     */
+    initModalEvents() {
+        const modal = document.getElementById('coordModal');
+        const closeBtn = document.querySelector('.close');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const locateBtn = document.getElementById('locateBtn');
+        
+        // 关闭按钮
+        closeBtn.addEventListener('click', () => {
+            this.hideCoordInputModal();
+        });
+        
+        // 取消按钮
+        cancelBtn.addEventListener('click', () => {
+            this.hideCoordInputModal();
+        });
+        
+        // 定位按钮
+        locateBtn.addEventListener('click', () => {
+            this.locateByCoordinates();
+        });
+        
+        // 点击模态框外部关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideCoordInputModal();
             }
-            
-            this.updateCoordinateDisplay('click', displayLng, displayLat);
-        }
+        });
+        
+        // ESC键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                this.hideCoordInputModal();
+            }
+        });
+        
+        // 回车键定位
+        const inputs = [document.getElementById('inputLng'), document.getElementById('inputLat')];
+        inputs.forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    this.locateByCoordinates();
+                }
+            });
+        });
     }
 
     /**
-     * 更新坐标显示
+     * 根据输入的坐标进行定位
      */
-    updateCoordinateDisplay(type, lng, lat) {
-        const formatted = this.formatCoordinate(lng, lat);
+    locateByCoordinates() {
+        const lngInput = document.getElementById('inputLng');
+        const latInput = document.getElementById('inputLat');
         
-        // 更新标签
-        this.updateCoordinateLabels(type);
+        const lng = parseFloat(lngInput.value);
+        const lat = parseFloat(latInput.value);
         
-        if (this.isCoordinateReversed) {
-            // 纬度在前
-            document.getElementById(`${type}-lng`).textContent = formatted.second;
-            document.getElementById(`${type}-lat`).textContent = formatted.first;
-        } else {
-            // 经度在前
-            document.getElementById(`${type}-lng`).textContent = formatted.first;
-            document.getElementById(`${type}-lat`).textContent = formatted.second;
+        // 验证输入
+        if (isNaN(lng) || isNaN(lat)) {
+            alert('请输入有效的经纬度数值');
+            return;
         }
+        
+        if (lng < -180 || lng > 180) {
+            alert('经度范围应在 -180 到 180 之间');
+            lngInput.focus();
+            return;
+        }
+        
+        if (lat < -90 || lat > 90) {
+            alert('纬度范围应在 -90 到 90 之间');
+            latInput.focus();
+            return;
+        }
+        
+        // 根据当前地图类型转换坐标
+        let mapLng = lng;
+        let mapLat = lat;
+        
+        if (this.currentMapType === 'gaode') {
+            // 输入的是WGS84坐标，需要转换为GCJ02用于地图显示
+            const gcj02 = this.coordConverter.wgs84ToGcj02(lng, lat);
+            mapLng = gcj02[0];
+            mapLat = gcj02[1];
+        }
+        
+        // 设置地图中心和缩放级别
+        this.map.setView([mapLat, mapLng], 15);
+        
+        // 添加标记
+        this.clearMarker();
+        this.currentMarker = L.marker([mapLat, mapLng], {
+            icon: L.divIcon({
+                className: 'pin-marker',
+                html: '<div style="color: #ff4757; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">📍</div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 24]
+            })
+        }).addTo(this.map);
+        
+
+        
+        // 添加弹出框
+        const popupContent = `
+            <div style="font-family: monospace; font-size: 12px; line-height: 1.4;">
+                <strong>输入坐标定位</strong><br>
+                <strong>经度:</strong> ${lng.toFixed(6)}<br>
+                <strong>纬度:</strong> ${lat.toFixed(6)}
+            </div>
+        `;
+        
+        this.currentMarker.bindPopup(popupContent).openPopup();
+        
+        // 更新状态
+        this.updateStatus(`已定位到坐标: ${lng.toFixed(6)}, ${lat.toFixed(6)}`);
+        
+        // 关闭模态框
+        this.hideCoordInputModal();
     }
 
-    /**
-     * 更新坐标标签
-     */
-    updateCoordinateLabels(type) {
-        const lngLabel = document.getElementById(`${type}-lng-label`);
-        const latLabel = document.getElementById(`${type}-lat-label`);
-        
-        if (this.isCoordinateReversed) {
-            // 纬度在前，经度在后
-            lngLabel.textContent = '纬度 (Lat):';
-            latLabel.textContent = '经度 (Lng):';
-        } else {
-            // 经度在前，纬度在后
-            lngLabel.textContent = '经度 (Lng):';
-            latLabel.textContent = '纬度 (Lat):';
-        }
-    }
+
+
+
 
 
 }

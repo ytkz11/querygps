@@ -51,6 +51,33 @@ body {
     z-index: 1000;
 }
 
+.toolbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.github-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.github-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .toolbar-left {
     display: flex;
     align-items: center;
@@ -80,12 +107,13 @@ body {
     border-color: rgba(255, 255, 255, 0.4);
 }
 
-.github-btn svg {
+.github-btn .github-icon {
+    font-size: 18px;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.github-btn:hover svg {
-    transform: scale(1.1) rotate(5deg);
+.github-btn:hover .github-icon {
+    transform: scale(1.2) rotate(10deg);
 }
 
 .app-title {
@@ -100,10 +128,136 @@ body {
     background-clip: text;
 }
 
+.toolbar-center {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex: 1;
+    justify-content: center;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
 .toolbar-right {
     display: flex;
     align-items: center;
     gap: 16px;
+    min-width: 300px;
+    justify-content: flex-end;
+}
+
+/* 固定坐标显示样式 */
+.fixed-coord {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 350px;
+}
+
+.fixed-coord .coord-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fixed-coord .coord-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    gap: 12px;
+}
+
+.fixed-coord .coord-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.fixed-coord .coord-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.fixed-coord .coord-value {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    backdrop-filter: blur(5px);
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+    user-select: text;
+    cursor: text;
+}
+
+.fixed-coord .coord-separator {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.copy-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    color: white;
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.copy-btn:active {
+    transform: scale(0.95);
+    background: rgba(0, 255, 136, 0.3);
+    border-color: rgba(0, 255, 136, 0.5);
+}
+
+.copy-btn svg {
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover svg {
+    color: #00ff88;
 }
 
 .map-type-selector {
@@ -154,93 +308,41 @@ body {
     padding: 8px;
 }
 
-.clear-btn, .info-btn {
-    padding: 14px 28px;
-    border: none;
-    border-radius: 16px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-    overflow: hidden;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    min-width: 160px;
-    justify-content: center;
-}
-
-.clear-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.6s;
-}
-
-.clear-btn:hover::before {
-    left: 100%;
-}
-
 .clear-btn {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .clear-btn:hover {
     background: linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
-    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
 }
 
 .clear-btn:active {
-    transform: translateY(-1px) scale(0.98);
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.2);
 }
 
-.clear-btn svg {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-.clear-btn:hover svg {
-    transform: rotate(90deg) scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-}
-
-.format-btn, .reverse-btn {
-    padding: 14px 20px;
+.format-btn, .input-btn, .clear-btn {
+    padding: 12px 18px;
     border: none;
-    border-radius: 16px;
-    font-size: 14px;
-    font-weight: 700;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     position: relative;
     overflow: hidden;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    min-width: 120px;
+    min-width: 100px;
     justify-content: center;
     color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .format-btn {
@@ -249,50 +351,28 @@ body {
 
 .format-btn:hover {
     background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
-    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
 }
 
 .format-btn:active {
-    transform: translateY(-1px) scale(0.98);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
 }
 
-.format-btn svg {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+.input-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
 }
 
-.format-btn:hover svg {
-    transform: scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+.input-btn:hover {
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
 }
 
-.reverse-btn {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
-}
-
-.reverse-btn:hover {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-.reverse-btn:active {
-    transform: translateY(-1px) scale(0.98);
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-}
-
-.reverse-btn svg {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-.reverse-btn:hover svg {
-    transform: rotate(180deg) scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+.input-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2);
 }
 
 .info-btn {
@@ -314,110 +394,73 @@ body {
     overflow: hidden;
 }
 
-/* 坐标显示面板 */
-.coord-panel {
-    padding: 20px 30px;
-    background: rgba(255, 255, 255, 0.08);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* 右下角动态坐标显示 */
+.dynamic-coord {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(15px);
-}
-
-.coord-container {
-    display: flex;
-    gap: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.coord-card {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 20px;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
 }
 
-.coord-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    background: rgba(255, 255, 255, 0.18);
+.dynamic-coord.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.coord-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.coord-icon {
-    font-size: 20px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-.coord-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.coord-content {
+.coord-display {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
+    min-width: 200px;
 }
 
-.coord-row {
+.coord-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
 }
 
-.coord-row .coord-label {
-    font-size: 14px;
+.coord-item .coord-label {
+    font-size: 12px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
 }
 
-.coord-row .coord-value {
+.coord-item .coord-value {
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
-    color: white;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    min-width: 120px;
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 255, 136, 0.3);
     text-align: center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
+    min-width: 100px;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
-/* 悬停坐标特殊样式 */
-.hover-coord {
-    border-left: 4px solid #10b981;
+/* 移动端隐藏动态坐标 */
+@media (max-width: 768px) {
+    .dynamic-coord {
+        display: none !important;
+    }
 }
 
-.hover-coord .coord-value {
-    background: rgba(16, 185, 129, 0.2);
-    border-color: rgba(16, 185, 129, 0.4);
-    color: #ecfdf5;
-}
 
-/* 点击坐标特殊样式 */
-.click-coord {
-    border-left: 4px solid #f59e0b;
-}
-
-.click-coord .coord-value {
-    background: rgba(245, 158, 11, 0.2);
-    border-color: rgba(245, 158, 11, 0.4);
-    color: #fffbeb;
-}
 
 
 
@@ -570,13 +613,7 @@ body {
 
 /* 响应式设计 - 平板设备 */
 @media (max-width: 1024px) {
-    .coord-container {
-        gap: 20px;
-    }
-    
-    .coord-card {
-        padding: 18px;
-    }
+    /* 平板设备样式 */
 }
 
 /* 响应式设计 - 手机设备 */
@@ -600,8 +637,69 @@ body {
         gap: 6px;
     }
     
+    .control-group {
+        gap: 8px;
+    }
+    
+    .button-group {
+        gap: 6px;
+        padding: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .fixed-coord {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        left: 10px;
+        min-width: unset;
+        max-width: unset;
+        font-size: 12px;
+    }
+    
+    .coord-row {
+        padding: 6px 8px;
+        gap: 8px;
+    }
+    
+    .coord-text {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+    
+    .coord-label {
+        font-size: 11px;
+    }
+    
+    .coord-value {
+        font-size: 11px;
+        padding: 1px 4px;
+    }
+    
+    .coord-separator {
+        font-size: 11px;
+    }
+    
+    .copy-btn {
+        width: 28px;
+        height: 28px;
+        padding: 4px;
+        min-width: unset;
+    }
+    
+    .github-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .github-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
     .format-btn,
-    .reverse-btn {
+    .input-btn {
         min-width: 80px;
         padding: 10px 14px;
         font-size: 12px;
@@ -609,7 +707,7 @@ body {
     }
     
     .format-btn svg,
-    .reverse-btn svg {
+    .input-btn svg {
         width: 14px;
         height: 14px;
     }
@@ -620,61 +718,7 @@ body {
         margin-bottom: 4px;
     }
     
-    .coord-panel {
-        padding: 8px 12px;
-    }
-    
-    .coord-container {
-        flex-direction: row;
-        gap: 8px;
-        overflow-x: auto;
-    }
-    
-    .coord-card {
-        flex: 1;
-        min-width: 160px;
-        padding: 8px 10px;
-        border-radius: 8px;
-    }
-    
-    .coord-header {
-        margin-bottom: 6px;
-        flex-direction: row;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .coord-icon {
-        font-size: 14px;
-    }
-    
-    .coord-title {
-        font-size: 12px;
-        font-weight: 600;
-    }
-    
-    .coord-content {
-        gap: 4px;
-    }
-    
-    .coord-row {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 4px;
-    }
-    
-    .coord-row .coord-label {
-        font-size: 11px;
-        flex-shrink: 0;
-    }
-    
-    .coord-row .coord-value {
-        font-size: 11px;
-        padding: 4px 6px;
-        min-width: 60px;
-        flex: 1;
-    }
+
     
     .clear-btn {
         min-width: 100px;
@@ -715,64 +759,20 @@ body {
         font-size: 1rem;
     }
     
-    .coord-panel {
-        padding: 6px 8px;
-    }
-    
-    .coord-container {
-        gap: 6px;
-    }
-    
-    .coord-card {
-        min-width: 140px;
-        padding: 6px 8px;
-        border-radius: 6px;
-    }
-    
-    .coord-header {
-        margin-bottom: 4px;
-        gap: 4px;
-    }
-    
-    .coord-icon {
-        font-size: 12px;
-    }
-    
-    .coord-title {
-        font-size: 10px;
-        font-weight: 600;
-    }
-    
-    .coord-content {
-        gap: 2px;
-    }
-    
-    .coord-row {
-        gap: 2px;
-    }
-    
-    .coord-row .coord-label {
-        font-size: 9px;
-    }
-    
-    .coord-row .coord-value {
-        font-size: 9px;
-        padding: 2px 4px;
-        min-width: 50px;
-    }
+
     
     .clear-btn,
     .info-btn,
     .github-btn,
     .format-btn,
-    .reverse-btn {
+    .input-btn {
         min-width: 70px;
         padding: 8px 12px;
         font-size: 11px;
     }
     
     .format-btn svg,
-    .reverse-btn svg {
+    .input-btn svg {
         width: 12px;
         height: 12px;
     }
@@ -798,6 +798,207 @@ body {
     }
 }
 
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    margin: 10% auto;
+    padding: 0;
+    border: none;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    padding: 25px 30px 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.close {
+    color: #6b7280;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.close:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 25px 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-sizing: border-box;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.input-note {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+}
+
+.input-note p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.modal-footer {
+    padding: 20px 30px 30px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.locate-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.locate-btn:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.cancel-btn {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 50%, #374151 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+}
+
+.cancel-btn:hover {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 50%, #4b5563 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+}
+
+/* 移动端模态框优化 */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
+        border-radius: 16px;
+    }
+    
+    .modal-header {
+        padding: 20px 20px 15px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.3rem;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px 25px;
+        flex-direction: column;
+    }
+    
+    .locate-btn,
+    .cancel-btn {
+        width: 100%;
+        padding: 14px;
+    }
+}
+
 /* 移动端触摸优化 */
 @media (hover: none) and (pointer: coarse) {
     /* 增加触摸目标大小 */
@@ -805,7 +1006,8 @@ body {
     .info-btn,
     .github-btn,
     .format-btn,
-    .reverse-btn {
+    .input-btn,
+    .map-type-select {
         min-height: 44px;
         touch-action: manipulation;
     }
@@ -826,19 +1028,12 @@ body {
     .info-btn:active,
     .github-btn:active,
     .format-btn:active,
-    .reverse-btn:active {
+    .input-btn:active {
         transform: scale(0.95);
         transition: transform 0.1s;
     }
     
-    .coord-card:hover {
-        transform: none;
-    }
-    
-    .coord-card:active {
-         transform: scale(0.98);
-         transition: transform 0.1s;
-     }
+
     
      /* 地图移动端优化 */
      #map {
@@ -857,23 +1052,7 @@ body {
      }
 }
 
-/* 自定义滚动条 */
-.coord-sidebar::-webkit-scrollbar {
-    width: 6px;
-}
 
-.coord-sidebar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.coord-sidebar::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-}
-
-.coord-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
 
 /* 加载动画 */
 .loading {
