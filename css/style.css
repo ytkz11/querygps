@@ -510,9 +510,9 @@ body {
     }
     
     .toolbar {
-        padding: 12px 16px;
+        padding: 8px 12px;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
         align-items: stretch;
     }
     
@@ -521,75 +521,92 @@ body {
     .toolbar-right {
         justify-content: center;
         flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .app-title {
-        font-size: 1.4rem;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    
-    .coord-panel {
-        padding: 12px 16px;
-    }
-    
-    .coord-container {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .coord-card {
-        padding: 14px;
-        border-radius: 12px;
-    }
-    
-    .coord-header {
-        margin-bottom: 12px;
-    }
-    
-    .coord-title {
-        font-size: 15px;
-    }
-    
-    .coord-row {
-        flex-direction: column;
-        align-items: flex-start;
         gap: 6px;
     }
     
+    .app-title {
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 4px;
+    }
+    
+    .coord-panel {
+        padding: 8px 12px;
+    }
+    
+    .coord-container {
+        flex-direction: row;
+        gap: 8px;
+        overflow-x: auto;
+    }
+    
+    .coord-card {
+        flex: 1;
+        min-width: 160px;
+        padding: 8px 10px;
+        border-radius: 8px;
+    }
+    
+    .coord-header {
+        margin-bottom: 6px;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .coord-icon {
+        font-size: 14px;
+    }
+    
+    .coord-title {
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .coord-content {
+        gap: 4px;
+    }
+    
+    .coord-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+    }
+    
     .coord-row .coord-label {
-        font-size: 13px;
+        font-size: 11px;
+        flex-shrink: 0;
     }
     
     .coord-row .coord-value {
-        min-width: 100%;
-        width: 100%;
-        font-size: 13px;
-        padding: 10px 12px;
+        font-size: 11px;
+        padding: 4px 6px;
+        min-width: 60px;
+        flex: 1;
     }
     
     .clear-btn {
-        min-width: 120px;
-        padding: 14px 20px;
-        font-size: 14px;
-        border-radius: 12px;
+        min-width: 100px;
+        padding: 10px 16px;
+        font-size: 12px;
+        border-radius: 8px;
     }
     
     .info-btn {
-        padding: 12px 20px;
-        font-size: 13px;
+        padding: 10px 16px;
+        font-size: 12px;
     }
     
     .github-btn {
-        padding: 12px 16px;
-        font-size: 13px;
+        padding: 10px 14px;
+        font-size: 12px;
     }
     
     .map-type-select {
         min-width: 100%;
-        padding: 12px 16px;
-        font-size: 14px;
+        padding: 8px 12px;
+        font-size: 12px;
     }
     
     #map {
@@ -600,66 +617,86 @@ body {
 /* 响应式设计 - 小屏手机 */
 @media (max-width: 480px) {
     .toolbar {
-        padding: 10px 12px;
-        gap: 10px;
-    }
-    
-    .app-title {
-        font-size: 1.2rem;
-    }
-    
-    .coord-panel {
-        padding: 10px 12px;
-    }
-    
-    .coord-container {
-        gap: 10px;
-    }
-    
-    .coord-card {
-        padding: 12px;
-        border-radius: 10px;
-    }
-    
-    .coord-title {
-        font-size: 14px;
-    }
-    
-    .coord-row .coord-label {
-        font-size: 12px;
-    }
-    
-    .coord-row .coord-value {
-        font-size: 12px;
-        padding: 8px 10px;
-    }
-    
-    .clear-btn {
-        min-width: 100px;
-        padding: 12px 16px;
-        font-size: 13px;
+        padding: 6px 8px;
         gap: 6px;
     }
     
-    .clear-btn svg {
-        width: 16px;
-        height: 16px;
+    .app-title {
+        font-size: 1rem;
     }
     
-    .github-btn {
-        padding: 10px 14px;
+    .coord-panel {
+        padding: 6px 8px;
+    }
+    
+    .coord-container {
+        gap: 6px;
+    }
+    
+    .coord-card {
+        min-width: 140px;
+        padding: 6px 8px;
+        border-radius: 6px;
+    }
+    
+    .coord-header {
+        margin-bottom: 4px;
+        gap: 4px;
+    }
+    
+    .coord-icon {
         font-size: 12px;
     }
     
+    .coord-title {
+        font-size: 10px;
+        font-weight: 600;
+    }
+    
+    .coord-content {
+        gap: 2px;
+    }
+    
+    .coord-row {
+        gap: 2px;
+    }
+    
+    .coord-row .coord-label {
+        font-size: 9px;
+    }
+    
+    .coord-row .coord-value {
+        font-size: 9px;
+        padding: 2px 4px;
+        min-width: 50px;
+    }
+    
+    .clear-btn {
+        min-width: 80px;
+        padding: 8px 12px;
+        font-size: 10px;
+        gap: 4px;
+    }
+    
+    .clear-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .github-btn {
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+    
     .github-btn svg {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
     }
     
     .map-type-select {
-         padding: 10px 14px;
-         font-size: 13px;
-     }
+        padding: 6px 8px;
+        font-size: 10px;
+    }
 }
 
 /* 移动端触摸优化 */
