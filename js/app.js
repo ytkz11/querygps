@@ -137,9 +137,9 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 显示经纬度坐标 (Lng, Lat)
-        document.getElementById('hover-coords').textContent = 
-            `${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`;
+        // 显示经纬度坐标，分别显示经度和纬度
+        document.getElementById('hover-lng').textContent = displayLng.toFixed(6);
+        document.getElementById('hover-lat').textContent = displayLat.toFixed(6);
 
         // 更新状态栏
         this.updateStatus(`鼠标停留坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
@@ -149,7 +149,8 @@ class CoordinateQueryApp {
      * 清除鼠标停留坐标显示
      */
     clearRealtimeCoordinates() {
-        document.getElementById('hover-coords').textContent = '移动鼠标获取坐标';
+        document.getElementById('hover-lng').textContent = '--';
+        document.getElementById('hover-lat').textContent = '--';
         this.updateStatus('移动鼠标查看坐标，点击地图固定坐标');
     }
 
@@ -185,9 +186,9 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 显示点击坐标 (Lng, Lat)
-        document.getElementById('click-coords').textContent = 
-            `${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`;
+        // 显示点击坐标，分别显示经度和纬度
+        document.getElementById('click-lng').textContent = displayLng.toFixed(6);
+        document.getElementById('click-lat').textContent = displayLat.toFixed(6);
 
         // 添加弹出框显示坐标信息
         const popupContent = `
@@ -214,7 +215,8 @@ class CoordinateQueryApp {
         }
 
         // 清除点击坐标显示
-        document.getElementById('click-coords').textContent = '点击地图获取坐标';
+        document.getElementById('click-lng').textContent = '--';
+        document.getElementById('click-lat').textContent = '--';
 
         this.updateStatus('已清除标记点');
     }
