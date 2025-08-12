@@ -142,6 +142,81 @@ body {
     gap: 16px;
 }
 
+/* 搜索组件样式 */
+.search-group {
+    display: flex;
+    align-items: center;
+}
+
+.search-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 4px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input-wrapper:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.search-input-wrapper:focus-within {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.place-search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    width: 200px;
+    transition: all 0.3s ease;
+}
+
+.place-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+}
+
+.place-search-input:focus {
+    width: 250px;
+}
+
+.search-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+}
+
+.search-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.search-btn:active {
+    transform: scale(0.95);
+}
+
 .button-group {
     display: flex;
     align-items: center;
@@ -163,6 +238,9 @@ body {
 
 /* 固定坐标显示样式 */
 .fixed-coord {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(15px);
     border-radius: 12px;
@@ -171,6 +249,7 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 350px;
+    z-index: 1000;
 }
 
 .fixed-coord .coord-display {
@@ -207,15 +286,15 @@ body {
 
 .fixed-coord .coord-value {
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
-    color: #00ff88;
-    background: rgba(0, 255, 136, 0.15);
+    color: #000000;
+    background: rgba(255, 255, 255, 0.9);
     padding: 2px 6px;
     border-radius: 4px;
-    border: 1px solid rgba(0, 255, 136, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
-    text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+    text-shadow: none;
     user-select: text;
     cursor: text;
 }
@@ -397,7 +476,7 @@ body {
 /* 右下角动态坐标显示 */
 .dynamic-coord {
     position: absolute;
-    bottom: 20px;
+    bottom: 60px;
     right: 20px;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(15px);
@@ -440,17 +519,17 @@ body {
 
 .coord-item .coord-value {
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
-    color: #00ff88;
-    background: rgba(0, 255, 136, 0.1);
+    color: #000000;
+    background: rgba(255, 255, 255, 0.9);
     padding: 4px 8px;
     border-radius: 6px;
-    border: 1px solid rgba(0, 255, 136, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     text-align: center;
     backdrop-filter: blur(5px);
     min-width: 100px;
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    text-shadow: none;
 }
 
 /* 移动端隐藏动态坐标 */
@@ -533,13 +612,7 @@ body {
 
 
 /* 底部状态栏 */
-.status-bar {
-    background: #343a40;
-    color: #adb5bd;
-    padding: 8px 20px;
-    font-size: 13px;
-    border-top: 1px solid #495057;
-}
+
 
 /* 模态框样式 */
 .modal {
@@ -620,6 +693,7 @@ body {
 @media (max-width: 768px) {
     .app-container {
         height: 100vh;
+        height: 100dvh; /* 动态视口高度 */
     }
     
     .toolbar {
@@ -627,14 +701,18 @@ body {
         flex-direction: column;
         gap: 8px;
         align-items: stretch;
+        min-height: auto;
     }
     
     .toolbar-left,
-    .toolbar-center,
-    .toolbar-right {
+    .toolbar-center {
         justify-content: center;
         flex-wrap: wrap;
         gap: 6px;
+    }
+    
+    .toolbar-right {
+        display: none; /* 隐藏GitHub按钮 */
     }
     
     .control-group {
@@ -648,6 +726,18 @@ body {
         justify-content: center;
     }
     
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+    
+    .map-wrapper {
+        flex: 1;
+        min-height: 0;
+    }
+    
     .fixed-coord {
         position: fixed;
         bottom: 60px;
@@ -656,6 +746,7 @@ body {
         min-width: unset;
         max-width: unset;
         font-size: 12px;
+        z-index: 1000;
     }
     
     .coord-row {
@@ -673,8 +764,12 @@ body {
     }
     
     .coord-value {
-        font-size: 11px;
-        padding: 1px 4px;
+        font-size: 14px;
+        padding: 3px 6px;
+        color: #000000;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        text-shadow: none;
     }
     
     .coord-separator {
@@ -745,6 +840,17 @@ body {
     
     #map {
         border-radius: 0;
+        touch-action: pan-x pan-y;
+        height: 100% !important;
+    }
+    
+    .leaflet-container {
+        touch-action: pan-x pan-y;
+    }
+    
+    /* 确保地图点击事件正常工作 */
+    .leaflet-clickable {
+        cursor: pointer;
     }
 }
 

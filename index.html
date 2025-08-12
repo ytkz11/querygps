@@ -34,6 +34,17 @@
                             <option value="gaode" selected>高德地图</option>
                         </select>
                     </div>
+                    <div class="search-group">
+                        <div class="search-input-wrapper">
+                            <input type="text" id="placeSearch" class="place-search-input" placeholder="输入地名搜索..." title="输入地名进行搜索定位">
+                            <button id="searchBtn" class="search-btn" title="搜索地名">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="m21 21-4.35-4.35"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                     <div class="button-group">
                         <button id="formatBtn" class="format-btn" title="切换坐标格式">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -86,6 +97,7 @@
                             <span class="coord-label">纬度:</span>
                             <span id="dynamic-lat" class="coord-value">--</span>
                         </div>
+
                     </div>
                 </div>
                 
@@ -110,10 +122,7 @@
             </div>
         </div>
         
-        <!-- 底部状态栏 -->
-        <div class="status-bar">
-            <span id="statusText">移动鼠标查看坐标</span>
-        </div>
+
     </div>
 
     <!-- 坐标输入模态框 -->

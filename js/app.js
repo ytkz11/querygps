@@ -11,9 +11,10 @@ class CoordinateQueryApp {
             gaode: null,
             osm: null
         };
-        this.currentMapType = 'gaode';
+        this.currentMapType = 'gaode'; // 默认高德地图
         this.coordinateFormat = 'decimal'; // 'decimal' 或 'dms' (度分秒)
         this.currentFixedCoords = null; // 当前固定坐标
+        this.currentDynamicCoords = null; // 当前动态坐标
         
         this.init();
     }
@@ -25,7 +26,17 @@ class CoordinateQueryApp {
         this.initMap();
         this.initMapLayers();
         this.initEventListeners();
-        this.updateStatus('应用已加载完成');
+        this.syncMapTypeSelector();
+    }
+
+    /**
+     * 同步地图类型选择器
+     */
+    syncMapTypeSelector() {
+        const selector = document.getElementById('mapTypeSelect');
+        if (selector) {
+            selector.value = this.currentMapType;
+        }
     }
 
     /**
@@ -51,7 +62,7 @@ class CoordinateQueryApp {
      */
     initMapLayers() {
         // 高德地图图层
-        this.mapLayers.gaode = L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+        this.mapLayers.gaode = L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=7&x={x}&y={y}&z={z}', {
             subdomains: ['1', '2', '3', '4'],
             attribution: '© 高德地图'
         });
@@ -108,10 +119,38 @@ class CoordinateQueryApp {
         this.map.on('click', (e) => {
             this.setFixedCoordinates(e.latlng);
         });
+        
+        // 移动端触摸事件支持
+        this.map.on('touchend', (e) => {
+            if (e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches.length === 1) {
+                // 单指触摸结束，触发坐标显示
+                const touch = e.originalEvent.changedTouches[0];
+                const point = this.map.mouseEventToContainerPoint(touch);
+                const latlng = this.map.containerPointToLatLng(point);
+                this.setFixedCoordinates(latlng);
+            }
+        });
 
         // 复制按钮事件
         document.getElementById('copyCoords').addEventListener('click', () => {
             this.copyToClipboard('both');
+        });
+        
+        // 动态坐标复制按钮已移除
+        // document.getElementById('copyDynamicCoords').addEventListener('click', () => {
+        //     this.copyDynamicCoordinates();
+        // });
+        
+        // 地名搜索按钮事件
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            this.searchPlace();
+        });
+        
+        // 搜索输入框回车事件
+        document.getElementById('placeSearch').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.searchPlace();
+            }
         });
     }
 
@@ -134,7 +173,7 @@ class CoordinateQueryApp {
                 'osm': 'OpenStreetMap'
             };
             
-            this.updateStatus(`已切换到 ${mapNames[mapType]}`);
+
         }
     }
 
@@ -157,11 +196,16 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
+        // 存储当前动态坐标用于复制
+        this.currentDynamicCoords = {
+            lng: displayLng,
+            lat: displayLat
+        };
+
         // 显示动态坐标
         this.showDynamicCoordinates(displayLng, displayLat);
 
-        // 更新状态栏
-        this.updateStatus(`当前坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
+
     }
 
     /**
@@ -189,7 +233,7 @@ class CoordinateQueryApp {
     hideDynamicCoordinates() {
         const coordElement = document.getElementById('dynamicCoord');
         coordElement.classList.remove('show');
-        this.updateStatus('移动鼠标查看坐标');
+
     }
 
     /**
@@ -211,17 +255,29 @@ class CoordinateQueryApp {
         }
         // OSM地图本身就是WGS84，无需转换
 
-        // 存储当前坐标用于复制
+        // 存储当前坐标用于复制（统一使用WGS84坐标）
         this.currentFixedCoords = {
             lng: displayLng,
             lat: displayLat
         };
 
+        // 添加图钉标记
+        this.clearMarker();
+        this.currentMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'pin-marker',
+                html: '<div style="color: #ff4757; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">📍</div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 24]
+            })
+        }).addTo(this.map);
+
+        // 弹出框已移除，只显示固定坐标面板
+
         // 显示固定坐标
         this.showFixedCoordinates(displayLng, displayLat);
 
-        // 更新状态栏
-        this.updateStatus(`已固定坐标: ${displayLng.toFixed(6)}, ${displayLat.toFixed(6)}`);
+
     }
 
     /**
@@ -246,32 +302,46 @@ class CoordinateQueryApp {
     /**
      * 复制坐标到剪贴板
      */
-    async copyToClipboard(type) {
+    async copyToClipboard(type = 'both') {
         if (!this.currentFixedCoords) {
-            this.updateStatus('请先点击地图获取坐标');
+            console.log('没有可复制的固定坐标');
             return;
         }
 
         let value;
-        if (type === 'both') {
+        if (type === 'both' || !type) {
             const formatted = this.formatCoordinate(this.currentFixedCoords.lng, this.currentFixedCoords.lat);
             value = `${formatted.lng}, ${formatted.lat}`;
+        } else if (type === 'lng') {
+            const formatted = this.formatCoordinate(this.currentFixedCoords.lng, this.currentFixedCoords.lat);
+            value = formatted.lng;
+        } else if (type === 'lat') {
+            const formatted = this.formatCoordinate(this.currentFixedCoords.lng, this.currentFixedCoords.lat);
+            value = formatted.lat;
+        }
+
+        if (!value) {
+            console.log('复制值为空');
+            return;
         }
 
         try {
             await navigator.clipboard.writeText(value);
-            this.updateStatus(`已复制坐标: ${value}`);
+            console.log('复制成功:', value);
             
             // 视觉反馈
             const button = document.getElementById('copyCoords');
-            button.style.background = 'rgba(0, 255, 136, 0.4)';
-            button.style.borderColor = 'rgba(0, 255, 136, 0.6)';
-            
-            setTimeout(() => {
-                button.style.background = '';
-                button.style.borderColor = '';
-            }, 500);
+            if (button) {
+                button.style.background = 'rgba(0, 255, 136, 0.4)';
+                button.style.borderColor = 'rgba(0, 255, 136, 0.6)';
+                
+                setTimeout(() => {
+                    button.style.background = '';
+                    button.style.borderColor = '';
+                }, 500);
+            }
         } catch (err) {
+            console.log('使用降级复制方案');
             // 降级方案：使用旧的复制方法
             const textArea = document.createElement('textarea');
             textArea.value = value;
@@ -280,7 +350,68 @@ class CoordinateQueryApp {
             document.execCommand('copy');
             document.body.removeChild(textArea);
             
-            this.updateStatus(`已复制坐标: ${value}`);
+            // 视觉反馈
+            const button = document.getElementById('copyCoords');
+            if (button) {
+                button.style.background = 'rgba(0, 255, 136, 0.4)';
+                button.style.borderColor = 'rgba(0, 255, 136, 0.6)';
+                
+                setTimeout(() => {
+                    button.style.background = '';
+                    button.style.borderColor = '';
+                }, 500);
+            }
+        }
+    }
+
+    /**
+     * 复制动态坐标到剪贴板
+     */
+    async copyDynamicCoordinates() {
+        if (!this.currentDynamicCoords) {
+            console.log('没有可复制的动态坐标');
+            return;
+        }
+
+        const formatted = this.formatCoordinate(this.currentDynamicCoords.lng, this.currentDynamicCoords.lat);
+        const value = `${formatted.lng}, ${formatted.lat}`;
+
+        try {
+            await navigator.clipboard.writeText(value);
+            console.log('动态坐标复制成功:', value);
+            
+            // 视觉反馈
+            const button = document.getElementById('copyDynamicCoords');
+            if (button) {
+                button.style.background = 'rgba(0, 255, 136, 0.4)';
+                button.style.borderColor = 'rgba(0, 255, 136, 0.6)';
+                
+                setTimeout(() => {
+                    button.style.background = '';
+                    button.style.borderColor = '';
+                }, 500);
+            }
+        } catch (err) {
+            console.log('使用动态坐标降级复制方案');
+            // 降级方案：使用旧的复制方法
+            const textArea = document.createElement('textarea');
+            textArea.value = value;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // 视觉反馈
+            const button = document.getElementById('copyDynamicCoords');
+            if (button) {
+                button.style.background = 'rgba(0, 255, 136, 0.4)';
+                button.style.borderColor = 'rgba(0, 255, 136, 0.6)';
+                
+                setTimeout(() => {
+                    button.style.background = '';
+                    button.style.borderColor = '';
+                }, 500);
+            }
         }
     }
 
@@ -295,15 +426,10 @@ class CoordinateQueryApp {
             this.currentMarker = null;
         }
 
-        this.updateStatus('已清除标记点');
+
     }
 
-    /**
-     * 更新状态栏
-     */
-    updateStatus(message) {
-        document.getElementById('statusText').textContent = message;
-    }
+
 
     /**
      * 将小数点坐标转换为度分秒格式
@@ -343,14 +469,18 @@ class CoordinateQueryApp {
         this.coordinateFormat = this.coordinateFormat === 'decimal' ? 'dms' : 'decimal';
         
         // 更新按钮文本
-        const formatBtn = document.getElementById('formatToggle');
+        const formatBtn = document.getElementById('formatBtn');
         const textNodes = Array.from(formatBtn.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
         if (textNodes.length > 0) {
             textNodes[textNodes.length - 1].textContent = this.coordinateFormat === 'decimal' ? '小数点' : '度分秒';
         }
         
         const formatName = this.coordinateFormat === 'decimal' ? '小数点格式' : '度分秒格式';
-        this.updateStatus(`已切换到${formatName}`);
+        
+        // 如果当前有固定坐标显示，更新其格式
+        if (this.currentFixedCoords) {
+            this.showFixedCoordinates(this.currentFixedCoords.lng, this.currentFixedCoords.lat);
+        }
     }
 
     /**
@@ -428,6 +558,91 @@ class CoordinateQueryApp {
     }
 
     /**
+     * 搜索地名并定位
+     */
+    async searchPlace() {
+        const searchInput = document.getElementById('placeSearch');
+        const query = searchInput.value.trim();
+        
+        if (!query) {
+            alert('请输入要搜索的地名');
+            searchInput.focus();
+            return;
+        }
+        
+        // 显示搜索状态
+        const searchBtn = document.getElementById('searchBtn');
+        const originalHTML = searchBtn.innerHTML;
+        searchBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/></svg>';
+        searchBtn.disabled = true;
+        
+        try {
+            // 使用Nominatim API进行地理编码
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&accept-language=zh-CN,zh,en`);
+            
+            if (!response.ok) {
+                throw new Error('搜索服务暂时不可用');
+            }
+            
+            const results = await response.json();
+            
+            if (results.length === 0) {
+                alert(`未找到"${query}"的位置信息，请尝试更具体的地名`);
+                return;
+            }
+            
+            const result = results[0];
+            const lat = parseFloat(result.lat);
+            const lng = parseFloat(result.lon);
+            
+            // 根据当前地图类型转换坐标
+            let mapLng = lng;
+            let mapLat = lat;
+            
+            console.log('当前地图类型:', this.currentMapType);
+            console.log('原始WGS84坐标:', lng, lat);
+            
+            if (this.currentMapType === 'gaode') {
+                // Nominatim返回的是WGS84坐标，需要转换为GCJ02用于高德地图显示
+                const gcj02 = this.coordConverter.wgs84ToGcj02(lng, lat);
+                mapLng = gcj02[0];
+                mapLat = gcj02[1];
+                console.log('转换后GCJ02坐标:', mapLng, mapLat);
+            } else {
+                console.log('使用原始WGS84坐标');
+            }
+            
+            // 设置地图中心和缩放级别
+            this.map.setView([mapLat, mapLng], 15);
+            
+            // 添加标记
+            this.clearMarker();
+            this.currentMarker = L.marker([mapLat, mapLng], {
+                icon: L.divIcon({
+                    className: 'pin-marker',
+                    html: '<div style="color: #ff4757; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">📍</div>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 24]
+                })
+            }).addTo(this.map);
+            
+            // 使用setFixedCoordinates统一处理坐标转换和显示
+            this.setFixedCoordinates({lat: mapLat, lng: mapLng});
+            
+            // 清空搜索框
+            searchInput.value = '';
+            
+        } catch (error) {
+            console.error('搜索错误:', error);
+            alert('搜索失败，请检查网络连接或稍后重试');
+        } finally {
+            // 恢复搜索按钮状态
+            searchBtn.innerHTML = originalHTML;
+            searchBtn.disabled = false;
+        }
+    }
+    
+    /**
      * 根据输入的坐标进行定位
      */
     locateByCoordinates() {
@@ -480,21 +695,8 @@ class CoordinateQueryApp {
             })
         }).addTo(this.map);
         
-
-        
-        // 添加弹出框
-        const popupContent = `
-            <div style="font-family: monospace; font-size: 12px; line-height: 1.4;">
-                <strong>输入坐标定位</strong><br>
-                <strong>经度:</strong> ${lng.toFixed(6)}<br>
-                <strong>纬度:</strong> ${lat.toFixed(6)}
-            </div>
-        `;
-        
-        this.currentMarker.bindPopup(popupContent).openPopup();
-        
-        // 更新状态
-        this.updateStatus(`已定位到坐标: ${lng.toFixed(6)}, ${lat.toFixed(6)}`);
+        // 使用setFixedCoordinates统一处理坐标转换和显示
+        this.setFixedCoordinates({lat: mapLat, lng: mapLng});
         
         // 关闭模态框
         this.hideCoordInputModal();
